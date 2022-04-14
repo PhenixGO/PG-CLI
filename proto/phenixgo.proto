@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package phenixgo;
+option go_package = "./;proto";
+
+import "generic.proto";
+import "model.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+service PhenixGO {
+  rpc StartSubUserStrategy (StartSubUserStrategyRequest) returns (StartSubUserStrategyResponse) {}
+  rpc StopSubUserStrategy (StopSubUserStrategyRequest) returns (StopSubUserStrategyResponse) {}
+  rpc GetSubUserStrategy (GetSubUserStrategyRequest) returns (GetSubUserStrategyResponse) {}
+  rpc GetPredictedPerformance (GetPredictedPerformanceRequest) returns (GetPredictedPerformanceResponse) {}
+  rpc GetPerformance (GetPerformanceRequest) returns (GetPerformanceResponse) {}
+}
+
+message StartSubUserStrategyRequest {
+  string strategy_name = 1;
+  google.protobuf.Any parameter = 2;
+  google.protobuf.StringValue group = 3;
+  model.ExchangeAPIKey apikey1 = 4;
+  model.ExchangeAPIKey apikey2 = 5;
+}
+
+message StartSubUserStrategyResponse {
+  model.Strategy strategy = 1;
+}
+
+message StopSubUserStrategyRequest {
+  string strategy_id = 1;
+}
+
+message StopSubUserStrategyResponse {
+  string strategy_id = 1;
+}
+
+message StrategyFilter {
+  google.protobuf.StringValue strategy_id = 1;
+  google.protobuf.StringValue strategy_name = 2;
+  google.protobuf.StringValue group =3;
+}
+
+message GetSubUserStrategyRequest {
+  StrategyFilter filter = 1;
+  generic.Pagination page = 2;
+}
+
+message GetSubUserStrategyResponse {
+  repeated model.Strategy strategyList = 1;
+}
+
+message GetPredictedPerformanceRequest {
+  string strategy_name = 1;
+  google.protobuf.Any parameter = 2;
+}
+
+message GetPredictedPerformanceResponse {
+  string strategy_name = 1;
+  double apy = 2;
+}
+
+message GetPerformanceRequest {
+  string strategy_id = 1;
+  google.protobuf.Timestamp start_time =2;
+  google.protobuf.Timestamp end_time =3;
+}
+
+message GetPerformanceResponse {
+  repeated model.Performance performances = 1;
+}

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package model;
+option go_package = "./;proto";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+message ExchangeAPIKey {
+  string public_key = 1;
+  string private_key = 2;
+  string exchange = 3;
+  google.protobuf.StringValue sub_account = 4;
+}
+
+message SPFParameter {
+  double initial_balance = 1;
+  string currency = 2;
+  double spread = 3;
+  double size = 4;
+}
+
+message Strategy {
+  string strategy_id = 1;
+  string strategy_name = 2;
+  google.protobuf.Any parameter = 3;
+  google.protobuf.StringValue group = 4;
+}
+
+message Performance {
+  string performance_id = 1;
+  string desc = 2;
+  double pnl = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}
