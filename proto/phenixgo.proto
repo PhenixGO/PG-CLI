@@ -9,65 +9,84 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 
+/**
+ * PhenixGO GRPC functions
+ */
 service PhenixGO {
-  rpc StartSubUserStrategy (StartSubUserStrategyRequest) returns (StartSubUserStrategyResponse) {}
-  rpc StopSubUserStrategy (StopSubUserStrategyRequest) returns (StopSubUserStrategyResponse) {}
-  rpc GetSubUserStrategy (GetSubUserStrategyRequest) returns (GetSubUserStrategyResponse) {}
-  rpc GetPredictedPerformance (GetPredictedPerformanceRequest) returns (GetPredictedPerformanceResponse) {}
-  rpc GetPerformance (GetPerformanceRequest) returns (GetPerformanceResponse) {}
+  // StartUserStrategy function for initiate a strategy.
+  rpc StartUserStrategy (StartUserStrategyRequest) returns (StartUserStrategyResponse) {}
+  // UpdateUserStrategy function for updating a running strategy.
+  rpc UpdateUserStrategy (UpdateUserStrategyRequest) returns (UpdateUserStrategyResponse) {}
+  // StopUserStrategy function for stopping a running strategy.
+  rpc StopUserStrategy (StopUserStrategyRequest) returns (StopUserStrategyResponse) {}
+  // GetUserStrategy function for stopping a running strategy.
+  rpc GetUserStrategy (GetUserStrategyRequest) returns (GetUserStrategyResponse) {}
+  // GetStrategyProfits function for retrieving strategy profit history.
+  rpc GetStrategyProfits (GetStrategyProfitsRequest) returns (GetStrategyProfitsResponse) {}
 }
 
-message StartSubUserStrategyRequest {
-  string strategy_name = 1;
-  google.protobuf.Any parameter = 2;
-  google.protobuf.StringValue group = 3;
-  model.ExchangeAPIKey apikey1 = 4;
-  model.ExchangeAPIKey apikey2 = 5;
+/* StartUserStrategyRequest represents request for starting a strategy. */
+message StartUserStrategyRequest {
+  string strategy_name = 1; // strategy name.
+  google.protobuf.Any parameter = 2; // strategy parameters. (ex. LendingParameter)
+  google.protobuf.StringValue tag = 3; // strategy tag for classfying.
+  model.ExchangeAPIKey apikey1 = 4; // first exchange api key. (for all strategy)
+  model.ExchangeAPIKey apikey2 = 5; // second exchange api key. (for cross exchange strategy. ex: Bitgin Arbitrage)
 }
 
-message StartSubUserStrategyResponse {
-  model.Strategy strategy = 1;
+/* StartUserStrategyResponse returns created strategy information. */
+message StartUserStrategyResponse {
+  model.Strategy strategy = 1; // strategy data.
 }
 
-message StopSubUserStrategyRequest {
-  string strategy_id = 1;
+/* UpdateUserStrategyRequest represents request for updating a strategy. */
+message UpdateUserStrategyRequest {
+ string strategy_id = 1; // specified target strategy id.
+ google.protobuf.Any parameter = 2; // specified update parameters.
 }
 
-message StopSubUserStrategyResponse {
-  string strategy_id = 1;
+/* UpdateUserStrategyResponse returns strategy id if update successfully. */
+message UpdateUserStrategyResponse {
+  string strategy_id = 1; // updated strategy id.
 }
 
+/* StopUserStrategyRequest represents request for stopping a strategy. */
+message StopUserStrategyRequest {
+  string strategy_id = 1; // specified target strategy id.
+}
+
+/* StopUserStrategyResponse returns strategy id if stop successfully. */
+message StopUserStrategyResponse {
+  string strategy_id = 1; // stopping strategy id.
+}
+
+/* StrategyFilter represents a search query, with options strategy_id, strategy_name  and tag to indicate which results to include in the responose. */
 message StrategyFilter {
-  google.protobuf.StringValue strategy_id = 1;
-  google.protobuf.StringValue strategy_name = 2;
-  google.protobuf.StringValue group =3;
+  google.protobuf.StringValue strategy_id = 1; // strategy_id.
+  google.protobuf.StringValue strategy_name = 2; // strategy_name.
+  google.protobuf.StringValue tag = 3; // tag for classify.
 }
 
-message GetSubUserStrategyRequest {
-  StrategyFilter filter = 1;
-  generic.Pagination page = 2;
+/* GetUserStrategyRequest represents a search query, with options StrategyFilter and Pagination to indicate which results to include in the response. */
+message GetUserStrategyRequest {
+  StrategyFilter filter = 1; // condition of the request
+  generic.Pagination page = 2; // range of the response
 }
 
-message GetSubUserStrategyResponse {
-  repeated model.Strategy strategyList = 1;
+/* GetUserStrategyResponse returns strategy array for the matches query. */
+message GetUserStrategyResponse {
+  repeated model.Strategy strategies = 1; // strategy data.
 }
 
-message GetPredictedPerformanceRequest {
-  string strategy_name = 1;
-  google.protobuf.Any parameter = 2;
+/**
+ * GetStrategyProfitsRequest represent a query, that specify time range to indicate profit data to return. */
+message GetStrategyProfitsRequest {
+  string strategy_id = 1; // strategy id means profit from.
+  google.protobuf.Timestamp start_time = 2; // query range start.
+  google.protobuf.Timestamp end_time = 3; // query range end.
 }
 
-message GetPredictedPerformanceResponse {
-  string strategy_name = 1;
-  double apy = 2;
-}
-
-message GetPerformanceRequest {
-  string strategy_id = 1;
-  google.protobuf.Timestamp start_time =2;
-  google.protobuf.Timestamp end_time =3;
-}
-
-message GetPerformanceResponse {
-  repeated model.Performance performances = 1;
+/* GetStrategyProfitsResponse returns profit data. */
+message GetStrategyProfitsResponse {
+  repeated model.Profit profits = 1; // profit data.
 }

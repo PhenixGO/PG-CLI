@@ -3,7 +3,8 @@ syntax = "proto3";
 package generic;
 option go_package = "./;proto";
 
+/* Pagination represents a search query, with offset and limit options to  indicate which results to include in the response. */
 message Pagination {
-  uint64 offset = 1;
-  uint64 limit = 2;
+  uint64 offset = 1; // indicate response from the index.
+  uint64 limit = 2; // indicate response number of data to return.
 }

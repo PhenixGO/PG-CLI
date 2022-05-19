@@ -7,13 +7,15 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 
+/* ExchangeAPIKey represents exchange key pairs and subaccount to be use in the strategy. */
 message ExchangeAPIKey {
-  string public_key = 1;
-  string private_key = 2;
-  string exchange = 3;
-  google.protobuf.StringValue sub_account = 4;
+  string public_key = 1; // exchange key pair, the one can be public.
+  string private_key = 2; // exchange key pair, the one is private.
+  string exchange = 3; // represent this key pair is belonging to the exchange.
+  google.protobuf.StringValue sub_account = 4; // specify sub-account if needed.
 }
 
+/* Not ready SPFParameter represent spot perpetual funding strategy. */
 message SPFParameter {
   double initial_balance = 1;
   string currency = 2;
@@ -21,16 +23,42 @@ message SPFParameter {
   double size = 4;
 }
 
-message Strategy {
-  string strategy_id = 1;
-  string strategy_name = 2;
-  google.protobuf.Any parameter = 3;
-  google.protobuf.StringValue group = 4;
+/* LendingParameter represents parameters for bitfinex lending strategy. */
+message LendingParameter {
+  string currency = 1; // specified lending currency, fill with capital currency symbol (ex. USD, USDT).
+  double max_amount = 2;  // represent max lending amount for running strategy. The sum of offer would be constrained by this value.
+  double keep_amount = 3; // specified funding balance should left this amount.
 }
 
-message Performance {
-  string performance_id = 1;
-  string desc = 2;
-  double pnl = 3;
-  google.protobuf.Timestamp timestamp = 4;
+/* BitginArbitrageParameter represents parameters for arbitrage between bitgin and the other exchanges.
+*
+* Note: for invoking StartUserStrategy for Bitgin Arbitrage need to fill the sell side and the buy side API key in the StartUserStrategyRequest (apikey1: Max, apikey2: Bitgin).
+ */
+message BitginArbitrageParameter {
+  double usdt_amount = 1; // used to specified USDT amount to run (must be prepare in max and large than 500).
+  double min_rate = 2; // used to specified the min profit for place order price (must large than 0.15).
+}
+
+/* Strategy represents the data form for the strategy. */
+message Strategy {
+  string strategy_id = 1; // unique strategy id for a strategy data.
+  string strategy_name = 2; // name
+  google.protobuf.Any parameter = 3; // parameters for specified strategy (BitginArbitrageParameter, LendingParameter...).
+  string status = 4; // strategy status (running, stopping, stopped, error).
+  google.protobuf.StringValue error_message = 5; // strategy error message
+  string user_id = 6; // user id
+  google.protobuf.StringValue tag = 7; // tag for strategy instance
+  google.protobuf.Timestamp created_at = 8; // strategy create time
+  google.protobuf.Timestamp updated_at = 9; // strategy update time
+  google.protobuf.Timestamp closed_at = 10; // strategy end time
+}
+
+/* Profit represents the data form for the profit. */
+message Profit {
+  string profit_id = 1; // unique profit id for a profit data.
+  string currency = 2; // profit currency
+  string type = 3; // description for the profit
+  double amount = 4; // amount for the profit currency
+  double rate = 5; // profit rate means the percentage of investing amount
+  google.protobuf.Timestamp time = 6; // profit accounting time
 }
