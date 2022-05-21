@@ -20,7 +20,7 @@ service PhenixGO {
   // StopUserStrategy function for stopping a running strategy.
   rpc StopUserStrategy (StopUserStrategyRequest) returns (StopUserStrategyResponse) {}
   // GetUserStrategy function for stopping a running strategy.
-  rpc GetUserStrategy (GetUserStrategyRequest) returns (GetUserStrategyResponse) {}
+  rpc GetUserStrategy (GetStrategyRequest) returns (GetStrategyResponse) {}
   // GetStrategyProfits function for retrieving strategy profit history.
   rpc GetStrategyProfits (GetStrategyProfitsRequest) returns (GetStrategyProfitsResponse) {}
 }
@@ -65,16 +65,17 @@ message StrategyFilter {
   google.protobuf.StringValue strategy_id = 1; // strategy_id.
   google.protobuf.StringValue strategy_name = 2; // strategy_name.
   google.protobuf.StringValue tag = 3; // tag for classify.
+  repeated google.protobuf.StringValue status = 4;
 }
 
-/* GetUserStrategyRequest represents a search query, with options StrategyFilter and Pagination to indicate which results to include in the response. */
-message GetUserStrategyRequest {
+/* GetStrategyRequest represents a search query, with options StrategyFilter and Pagination to indicate which results to include in the response. */
+message GetStrategyRequest {
   StrategyFilter filter = 1; // condition of the request
   generic.Pagination page = 2; // range of the response
 }
 
-/* GetUserStrategyResponse returns strategy array for the matches query. */
-message GetUserStrategyResponse {
+/* GetStrategyResponse returns strategy array for the matches query. */
+message GetStrategyResponse {
   repeated model.Strategy strategies = 1; // strategy data.
 }
 

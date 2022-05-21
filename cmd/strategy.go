@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	pb "github.com/pg-cli/proto"
@@ -24,7 +25,8 @@ var (
 	strategyName string
 	strategyID   string
 	parameter    string
-	group        string
+	tag          string
+	status       string
 	limit        uint64
 	offset       uint64
 	startTime    string
@@ -37,7 +39,7 @@ func init() {
 	rootCmd.AddCommand(startStrategyCmd)
 	startStrategyCmd.Flags().StringVar(&strategyName, "strategy-name", "", "Strategy Name")
 	startStrategyCmd.Flags().StringVar(&parameter, "parameter", "", "Strategy Parameter")
-	startStrategyCmd.Flags().StringVar(&group, "group", "", "Strategy Group")
+	startStrategyCmd.Flags().StringVar(&tag, "tag", "", "Strategy Tag")
 	startStrategyCmd.Flags().StringVar(&apikey1, "apikey1", "", "The first set of exchange api key")
 	startStrategyCmd.Flags().StringVar(&apikey2, "apikey2", "", "The second set of exchange api key")
 
@@ -45,24 +47,22 @@ func init() {
 	stopStrategyCmd.Flags().StringVar(&strategyID, "strategy-id", "", "Strategy ID")
 
 	rootCmd.AddCommand(listStrategyCmd)
-	listStrategyCmd.Flags().StringVar(&group, "group", "", "Strategy Group")
+	listStrategyCmd.Flags().StringVar(&tag, "tag", "", "Strategy Tag")
+	listStrategyCmd.Flags().StringVar(&status, "status", "", "Strategy Status")
 	listStrategyCmd.Flags().Uint64Var(&limit, "limit", 100, "Pagination Limit")
 	listStrategyCmd.Flags().Uint64Var(&offset, "offset", 0, "Pagination Offset")
 
-	rootCmd.AddCommand(predictedPerfCmd)
-	predictedPerfCmd.Flags().StringVar(&strategyName, "strategy-name", "", "Strategy Name")
-	predictedPerfCmd.Flags().StringVar(&parameter, "parameter", "", "Strategy Parameter")
-
-	rootCmd.AddCommand(perfCmd)
-	perfCmd.Flags().StringVar(&strategyID, "strategy-id", "", "Strategy ID")
-	perfCmd.Flags().StringVar(&startTime, "start-time", "", "Query range start time. format in RFC3339(2006-01-02T15:04:05Z07:00)")
-	perfCmd.Flags().StringVar(&endTime, "end-time", "", "Query range end time. format in RFC3339(2006-01-02T15:04:05Z07:00)")
+	rootCmd.AddCommand(profitCmd)
+	profitCmd.Flags().StringVar(&strategyID, "strategy-id", "", "Strategy ID")
+	profitCmd.Flags().StringVar(&startTime, "start-time", "", "Query range start time. format in RFC3339(2006-01-02T15:04:05Z07:00)")
+	profitCmd.Flags().StringVar(&endTime, "end-time", "", "Query range end time. format in RFC3339(2006-01-02T15:04:05Z07:00)")
 }
 
 func connect() {
 	config := &tls.Config{
 		InsecureSkipVerify: false,
 	}
+
 	conn, err := grpc.Dial(
 		viper.GetString("endpoint"),
 		grpc.WithTransportCredentials(credentials.NewTLS(config)),
@@ -77,7 +77,6 @@ var startStrategyCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start strategy with parameters",
 	Run: func(cmd *cobra.Command, args []string) {
-
 		connect()
 		md := metadata.Pairs("X-API-KEY", viper.GetString("token"))
 		ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -92,20 +91,20 @@ var startStrategyCmd = &cobra.Command{
 			cobra.CheckErr(fmt.Errorf("apikey1 flag should not be empty"))
 		}
 
-		spfparam := pb.SPFParameter{}
-		err := json.Unmarshal([]byte(parameter), &spfparam)
+		baParam := pb.BitginArbitrageParameter{}
+		err := json.Unmarshal([]byte(parameter), &baParam)
 		if err != nil {
 			cobra.CheckErr(err)
 		}
 
-		param, err := anypb.New(&spfparam)
+		param, err := anypb.New(&baParam)
 		if err != nil {
 			cobra.CheckErr(err)
 		}
 
-		var pgroup *wrapperspb.StringValue
-		if group != "" {
-			pgroup = wrapperspb.String(group)
+		var pTag *wrapperspb.StringValue
+		if tag != "" {
+			pTag = wrapperspb.String(tag)
 		}
 
 		papikey1 := pb.ExchangeAPIKey{}
@@ -125,10 +124,10 @@ var startStrategyCmd = &cobra.Command{
 			papikey2 = &t
 		}
 
-		_, err = pg.StartSubUserStrategy(ctx, &pb.StartSubUserStrategyRequest{
+		s, err := pg.StartUserStrategy(ctx, &pb.StartUserStrategyRequest{
 			StrategyName: strategyName,
 			Parameter:    param,
-			Group:        pgroup,
+			Tag:          pTag,
 			Apikey1:      &papikey1,
 			Apikey2:      papikey2,
 		})
@@ -136,6 +135,10 @@ var startStrategyCmd = &cobra.Command{
 		if err != nil {
 			cobra.CheckErr(err)
 		}
+
+		msg, _ := json.MarshalIndent(s, "", "  ")
+		fmt.Fprintln(os.Stderr, "Result:", string(msg))
+
 	},
 }
 
@@ -152,13 +155,16 @@ var stopStrategyCmd = &cobra.Command{
 			cobra.CheckErr(fmt.Errorf("strategy-id flag should not be empty"))
 		}
 
-		_, err := pg.StopSubUserStrategy(ctx, &pb.StopSubUserStrategyRequest{
+		s, err := pg.StopUserStrategy(ctx, &pb.StopUserStrategyRequest{
 			StrategyId: strategyID,
 		})
 
 		if err != nil {
 			cobra.CheckErr(err)
 		}
+
+		msg, _ := json.MarshalIndent(s, "", "  ")
+		fmt.Fprintln(os.Stderr, "Result:", string(msg))
 	},
 }
 
@@ -179,16 +185,27 @@ var listStrategyCmd = &cobra.Command{
 		if strategyName != "" {
 			pStrategyName = wrapperspb.String(strategyName)
 		}
-		var pGroup *wrapperspb.StringValue
-		if group != "" {
-			pGroup = wrapperspb.String(group)
+		var pTag *wrapperspb.StringValue
+		if tag != "" {
+			pTag = wrapperspb.String(tag)
 		}
-
-		_, err := pg.GetSubUserStrategy(ctx, &pb.GetSubUserStrategyRequest{
+		var pStatus []*wrapperspb.StringValue
+		if status != "" {
+			slice := []string{}
+			err := json.Unmarshal([]byte(status), &slice)
+			if err != nil {
+				cobra.CheckErr(err)
+			}
+			for _, s := range slice {
+				pStatus = append(pStatus, wrapperspb.String(s))
+			}
+		}
+		s, err := pg.GetUserStrategy(ctx, &pb.GetStrategyRequest{
 			Filter: &pb.StrategyFilter{
 				StrategyId:   pStrategyID,
 				StrategyName: pStrategyName,
-				Group:        pGroup,
+				Tag:          pTag,
+				Status:       pStatus,
 			},
 			Page: &pb.Pagination{
 				Limit:  limit,
@@ -199,50 +216,15 @@ var listStrategyCmd = &cobra.Command{
 		if err != nil {
 			cobra.CheckErr(err)
 		}
+
+		msg, _ := json.MarshalIndent(s, "", "  ")
+		fmt.Fprintln(os.Stderr, "Result:", string(msg))
 	},
 }
 
-var predictedPerfCmd = &cobra.Command{
-	Use:   "predict",
-	Short: "Get strategy predicted performance by query input",
-	Run: func(cmd *cobra.Command, args []string) {
-
-		connect()
-		md := metadata.Pairs("X-API-KEY", viper.GetString("token"))
-		ctx := metadata.NewOutgoingContext(context.Background(), md)
-
-		if strategyName == "" {
-			cobra.CheckErr(fmt.Errorf("strategy-name flag should not be empty"))
-		}
-		if parameter == "" {
-			cobra.CheckErr(fmt.Errorf("parameter flag should not be empty"))
-		}
-
-		spfparam := pb.SPFParameter{}
-		err := json.Unmarshal([]byte(parameter), &spfparam)
-		if err != nil {
-			cobra.CheckErr(err)
-		}
-
-		param, err := anypb.New(&spfparam)
-		if err != nil {
-			cobra.CheckErr(err)
-		}
-		_, err = pg.GetPredictedPerformance(ctx,
-			&pb.GetPredictedPerformanceRequest{
-				StrategyName: strategyName,
-				Parameter:    param,
-			})
-
-		if err != nil {
-			cobra.CheckErr(err)
-		}
-	},
-}
-
-var perfCmd = &cobra.Command{
-	Use:   "performance",
-	Short: "Get strategy performance",
+var profitCmd = &cobra.Command{
+	Use:   "profit",
+	Short: "Get strategy profit",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		connect()
@@ -250,7 +232,7 @@ var perfCmd = &cobra.Command{
 		ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 		if strategyID == "" {
-			cobra.CheckErr(fmt.Errorf("strategy-name flag should not be empty"))
+			cobra.CheckErr(fmt.Errorf("strategy-id flag should not be empty"))
 		}
 
 		var pStartTime *timestamppb.Timestamp
@@ -271,7 +253,7 @@ var perfCmd = &cobra.Command{
 			pEndTime = timestamppb.New(t)
 		}
 
-		_, err := pg.GetPerformance(ctx, &pb.GetPerformanceRequest{
+		s, err := pg.GetStrategyProfits(ctx, &pb.GetStrategyProfitsRequest{
 			StrategyId: strategyID,
 			StartTime:  pStartTime,
 			EndTime:    pEndTime,
@@ -280,5 +262,8 @@ var perfCmd = &cobra.Command{
 		if err != nil {
 			cobra.CheckErr(err)
 		}
+
+		msg, _ := json.MarshalIndent(s, "", "  ")
+		fmt.Fprintln(os.Stderr, "Result:", string(msg))
 	},
 }
