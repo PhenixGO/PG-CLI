@@ -3,11 +3,30 @@
 
 ## Table of Contents
 
+- [generic.proto](#generic-proto)
+    - [Pagination](#generic-Pagination)
+  
+- [model.proto](#model-proto)
+    - [BAState](#model-BAState)
+    - [BitginArbitrageParameter](#model-BitginArbitrageParameter)
+    - [ExchangeAPIKey](#model-ExchangeAPIKey)
+    - [LendingOffer](#model-LendingOffer)
+    - [LendingParameter](#model-LendingParameter)
+    - [LendingState](#model-LendingState)
+    - [Notification](#model-Notification)
+    - [Profit](#model-Profit)
+    - [SPFParameter](#model-SPFParameter)
+    - [Strategy](#model-Strategy)
+  
+    - [Event](#model-Event)
+  
 - [phenixgo.proto](#phenixgo-proto)
     - [GetStrategyProfitsRequest](#phenixgo-GetStrategyProfitsRequest)
     - [GetStrategyProfitsResponse](#phenixgo-GetStrategyProfitsResponse)
-    - [GetUserStrategyRequest](#phenixgo-GetUserStrategyRequest)
-    - [GetUserStrategyResponse](#phenixgo-GetUserStrategyResponse)
+    - [GetStrategyRequest](#phenixgo-GetStrategyRequest)
+    - [GetStrategyResponse](#phenixgo-GetStrategyResponse)
+    - [GetStrategyStateRequest](#phenixgo-GetStrategyStateRequest)
+    - [GetStrategyStateResponse](#phenixgo-GetStrategyStateResponse)
     - [StartUserStrategyRequest](#phenixgo-StartUserStrategyRequest)
     - [StartUserStrategyResponse](#phenixgo-StartUserStrategyResponse)
     - [StopUserStrategyRequest](#phenixgo-StopUserStrategyRequest)
@@ -18,197 +37,27 @@
   
     - [PhenixGO](#phenixgo-PhenixGO)
   
-- [model.proto](#model-proto)
-    - [BitginArbitrageParameter](#model-BitginArbitrageParameter)
-    - [ExchangeAPIKey](#model-ExchangeAPIKey)
-    - [LendingParameter](#model-LendingParameter)
-    - [Profit](#model-Profit)
-    - [SPFParameter](#model-SPFParameter)
-    - [Strategy](#model-Strategy)
-  
-- [generic.proto](#generic-proto)
-    - [Pagination](#generic-Pagination)
-  
 - [Scalar Value Types](#scalar-value-types)
 
 
 
-<a name="phenixgo-proto"></a>
+<a name="generic-proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## phenixgo.proto
+## generic.proto
 
 
 
-<a name="phenixgo-GetStrategyProfitsRequest"></a>
+<a name="generic-Pagination"></a>
 
-### GetStrategyProfitsRequest
-GetStrategyProfitsRequest represent a query, that specify time range to indicate profit data to return.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy_id | [string](#string) |  | strategy id means profit from. |
-| start_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | query range start. |
-| end_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | query range end. |
-
-
-
-
-
-
-<a name="phenixgo-GetStrategyProfitsResponse"></a>
-
-### GetStrategyProfitsResponse
-GetStrategyProfitsResponse returns profit data.
+### Pagination
+Pagination represents a search query, with offset and limit options to  indicate which results to include in the response.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| profits | [model.Profit](#model-Profit) | repeated | profit data. |
-
-
-
-
-
-
-<a name="phenixgo-GetUserStrategyRequest"></a>
-
-### GetUserStrategyRequest
-GetUserStrategyRequest represents a search query, with options StrategyFilter and Pagination to indicate which results to include in the response.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| filter | [StrategyFilter](#phenixgo-StrategyFilter) |  | condition of the request |
-| page | [generic.Pagination](#generic-Pagination) |  | range of the response |
-
-
-
-
-
-
-<a name="phenixgo-GetUserStrategyResponse"></a>
-
-### GetUserStrategyResponse
-GetUserStrategyResponse returns strategy array for the matches query.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategies | [model.Strategy](#model-Strategy) | repeated | strategy data. |
-
-
-
-
-
-
-<a name="phenixgo-StartUserStrategyRequest"></a>
-
-### StartUserStrategyRequest
-StartUserStrategyRequest represents request for starting a strategy.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy_name | [string](#string) |  | strategy name. |
-| parameter | [google.protobuf.Any](#google-protobuf-Any) |  | strategy parameters. (ex. LendingParameter) |
-| tag | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | strategy tag for classfying. |
-| apikey1 | [model.ExchangeAPIKey](#model-ExchangeAPIKey) |  | first exchange api key. (for all strategy) |
-| apikey2 | [model.ExchangeAPIKey](#model-ExchangeAPIKey) |  | second exchange api key. (for cross exchange strategy. ex: Bitgin Arbitrage) |
-
-
-
-
-
-
-<a name="phenixgo-StartUserStrategyResponse"></a>
-
-### StartUserStrategyResponse
-StartUserStrategyResponse returns created strategy information.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy | [model.Strategy](#model-Strategy) |  | strategy data. |
-
-
-
-
-
-
-<a name="phenixgo-StopUserStrategyRequest"></a>
-
-### StopUserStrategyRequest
-StopUserStrategyRequest represents request for stopping a strategy.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy_id | [string](#string) |  | specified target strategy id. |
-
-
-
-
-
-
-<a name="phenixgo-StopUserStrategyResponse"></a>
-
-### StopUserStrategyResponse
-StopUserStrategyResponse returns strategy id if stop successfully.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy_id | [string](#string) |  | stopping strategy id. |
-
-
-
-
-
-
-<a name="phenixgo-StrategyFilter"></a>
-
-### StrategyFilter
-StrategyFilter represents a search query, with options strategy_id, strategy_name  and tag to indicate which results to include in the responose.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy_id | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | strategy_id. |
-| strategy_name | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | strategy_name. |
-| tag | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | tag for classify. |
-
-
-
-
-
-
-<a name="phenixgo-UpdateUserStrategyRequest"></a>
-
-### UpdateUserStrategyRequest
-UpdateUserStrategyRequest represents request for updating a strategy.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy_id | [string](#string) |  | specified target strategy id. |
-| parameter | [google.protobuf.Any](#google-protobuf-Any) |  | specified update parameters. |
-
-
-
-
-
-
-<a name="phenixgo-UpdateUserStrategyResponse"></a>
-
-### UpdateUserStrategyResponse
-UpdateUserStrategyResponse returns strategy id if update successfully.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| strategy_id | [string](#string) |  | updated strategy id. |
+| offset | [uint64](#uint64) |  | indicate response from the index. |
+| limit | [uint64](#uint64) |  | indicate response number of data to return. |
 
 
 
@@ -219,20 +68,6 @@ UpdateUserStrategyResponse returns strategy id if update successfully.
  
 
  
-
-
-<a name="phenixgo-PhenixGO"></a>
-
-### PhenixGO
-PhenixGO GRPC functions
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| StartUserStrategy | [StartUserStrategyRequest](#phenixgo-StartUserStrategyRequest) | [StartUserStrategyResponse](#phenixgo-StartUserStrategyResponse) | StartUserStrategy function for initiate a strategy. |
-| UpdateUserStrategy | [UpdateUserStrategyRequest](#phenixgo-UpdateUserStrategyRequest) | [UpdateUserStrategyResponse](#phenixgo-UpdateUserStrategyResponse) | UpdateUserStrategy function for updating a running strategy. |
-| StopUserStrategy | [StopUserStrategyRequest](#phenixgo-StopUserStrategyRequest) | [StopUserStrategyResponse](#phenixgo-StopUserStrategyResponse) | StopUserStrategy function for stopping a running strategy. |
-| GetUserStrategy | [GetUserStrategyRequest](#phenixgo-GetUserStrategyRequest) | [GetUserStrategyResponse](#phenixgo-GetUserStrategyResponse) | GetUserStrategy function for stopping a running strategy. |
-| GetStrategyProfits | [GetStrategyProfitsRequest](#phenixgo-GetStrategyProfitsRequest) | [GetStrategyProfitsResponse](#phenixgo-GetStrategyProfitsResponse) | GetStrategyProfits function for retrieving strategy profit history. |
 
  
 
@@ -242,6 +77,24 @@ PhenixGO GRPC functions
 <p align="right"><a href="#top">Top</a></p>
 
 ## model.proto
+
+
+
+<a name="model-BAState"></a>
+
+### BAState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| total | [string](#string) |  |  |
+| sold | [string](#string) |  |  |
+| bought | [string](#string) |  |  |
+| updated_at | [string](#string) |  |  |
+
+
+
 
 
 
@@ -281,6 +134,26 @@ ExchangeAPIKey represents exchange key pairs and subaccount to be use in the str
 
 
 
+<a name="model-LendingOffer"></a>
+
+### LendingOffer
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+| rate | [string](#string) |  |  |
+| period | [int32](#int32) |  |  |
+| position_pair | [string](#string) |  |  |
+| created_at | [string](#string) |  |  |
+
+
+
+
+
+
 <a name="model-LendingParameter"></a>
 
 ### LendingParameter
@@ -292,6 +165,40 @@ LendingParameter represents parameters for bitfinex lending strategy.
 | currency | [string](#string) |  | specified lending currency, fill with capital currency symbol (ex. USD, USDT). |
 | max_amount | [double](#double) |  | represent max lending amount for running strategy. The sum of offer would be constrained by this value. |
 | keep_amount | [double](#double) |  | specified funding balance should left this amount. |
+
+
+
+
+
+
+<a name="model-LendingState"></a>
+
+### LendingState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| active_offers | [LendingOffer](#model-LendingOffer) | repeated |  |
+| open_offers | [LendingOffer](#model-LendingOffer) | repeated |  |
+| available_balance | [string](#string) |  |  |
+| updated_at | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="model-Notification"></a>
+
+### Notification
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| event | [Event](#model-Event) |  |  |
+| data | [bytes](#bytes) |  |  |
 
 
 
@@ -347,7 +254,7 @@ Strategy represents the data form for the strategy.
 | strategy_id | [string](#string) |  | unique strategy id for a strategy data. |
 | strategy_name | [string](#string) |  | name |
 | parameter | [google.protobuf.Any](#google-protobuf-Any) |  | parameters for specified strategy (BitginArbitrageParameter, LendingParameter...). |
-| status | [string](#string) |  | strategy status (running, stopping, stopped, error). |
+| status | [string](#string) |  | strategy status (running, stopping, stopped, completed, error). |
 | error_message | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | strategy error message |
 | user_id | [string](#string) |  | user id |
 | tag | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | tag for strategy instance |
@@ -361,31 +268,235 @@ Strategy represents the data form for the strategy.
 
  
 
- 
+
+<a name="model-Event"></a>
+
+### Event
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| EventUnknown | 0 |  |
+| EventStatus | 1 |  |
+| EventProfit | 2 |  |
+
 
  
 
  
 
+ 
 
 
-<a name="generic-proto"></a>
+
+<a name="phenixgo-proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## generic.proto
+## phenixgo.proto
 
 
 
-<a name="generic-Pagination"></a>
+<a name="phenixgo-GetStrategyProfitsRequest"></a>
 
-### Pagination
-Pagination represents a search query, with offset and limit options to  indicate which results to include in the response.
+### GetStrategyProfitsRequest
+GetStrategyProfitsRequest represent a query, that specify time range to indicate profit data to return.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| offset | [uint64](#uint64) |  | indicate response from the index. |
-| limit | [uint64](#uint64) |  | indicate response number of data to return. |
+| strategy_id | [string](#string) |  | strategy id means profit from. |
+| start_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | query range start. |
+| end_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | query range end. |
+
+
+
+
+
+
+<a name="phenixgo-GetStrategyProfitsResponse"></a>
+
+### GetStrategyProfitsResponse
+GetStrategyProfitsResponse returns profit data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| profits | [model.Profit](#model-Profit) | repeated | profit data. |
+
+
+
+
+
+
+<a name="phenixgo-GetStrategyRequest"></a>
+
+### GetStrategyRequest
+GetStrategyRequest represents a search query, with options StrategyFilter and Pagination to indicate which results to include in the response.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| filter | [StrategyFilter](#phenixgo-StrategyFilter) |  | condition of the request |
+| page | [generic.Pagination](#generic-Pagination) |  | range of the response |
+
+
+
+
+
+
+<a name="phenixgo-GetStrategyResponse"></a>
+
+### GetStrategyResponse
+GetStrategyResponse returns strategy array for the matches query.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategies | [model.Strategy](#model-Strategy) | repeated | strategy data. |
+
+
+
+
+
+
+<a name="phenixgo-GetStrategyStateRequest"></a>
+
+### GetStrategyStateRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="phenixgo-GetStrategyStateResponse"></a>
+
+### GetStrategyStateResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| state | [google.protobuf.Any](#google-protobuf-Any) |  |  |
+
+
+
+
+
+
+<a name="phenixgo-StartUserStrategyRequest"></a>
+
+### StartUserStrategyRequest
+StartUserStrategyRequest represents request for starting a strategy.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy_name | [string](#string) |  | strategy name. |
+| parameter | [google.protobuf.Any](#google-protobuf-Any) |  | strategy parameters. (ex. LendingParameter) |
+| tag | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | strategy tag for classfying. |
+| apikey1 | [model.ExchangeAPIKey](#model-ExchangeAPIKey) |  | first exchange api key. (for all strategy) |
+| apikey2 | [model.ExchangeAPIKey](#model-ExchangeAPIKey) |  | second exchange api key. (for cross exchange strategy. ex: Bitgin Arbitrage) |
+
+
+
+
+
+
+<a name="phenixgo-StartUserStrategyResponse"></a>
+
+### StartUserStrategyResponse
+StartUserStrategyResponse returns created strategy information.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy | [model.Strategy](#model-Strategy) |  | strategy data. |
+
+
+
+
+
+
+<a name="phenixgo-StopUserStrategyRequest"></a>
+
+### StopUserStrategyRequest
+StopUserStrategyRequest represents request for stopping a strategy.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy_id | [string](#string) |  | specified target strategy id. |
+| is_force | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="phenixgo-StopUserStrategyResponse"></a>
+
+### StopUserStrategyResponse
+StopUserStrategyResponse returns strategy id if stop successfully.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy_id | [string](#string) |  | stopping strategy id. |
+
+
+
+
+
+
+<a name="phenixgo-StrategyFilter"></a>
+
+### StrategyFilter
+StrategyFilter represents a search query, with options strategy_id, strategy_name  and tag to indicate which results to include in the responose.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy_id | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | strategy_id. |
+| strategy_name | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | strategy_name. |
+| tag | [google.protobuf.StringValue](#google-protobuf-StringValue) |  | tag for classify. |
+| status | [google.protobuf.StringValue](#google-protobuf-StringValue) | repeated |  |
+
+
+
+
+
+
+<a name="phenixgo-UpdateUserStrategyRequest"></a>
+
+### UpdateUserStrategyRequest
+UpdateUserStrategyRequest represents request for updating a strategy.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy_id | [string](#string) |  | specified target strategy id. |
+| parameter | [google.protobuf.Any](#google-protobuf-Any) |  | specified update parameters. |
+
+
+
+
+
+
+<a name="phenixgo-UpdateUserStrategyResponse"></a>
+
+### UpdateUserStrategyResponse
+UpdateUserStrategyResponse returns strategy id if update successfully.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| strategy_id | [string](#string) |  | updated strategy id. |
 
 
 
@@ -396,6 +507,21 @@ Pagination represents a search query, with offset and limit options to  indicate
  
 
  
+
+
+<a name="phenixgo-PhenixGO"></a>
+
+### PhenixGO
+PhenixGO GRPC functions
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| StartUserStrategy | [StartUserStrategyRequest](#phenixgo-StartUserStrategyRequest) | [StartUserStrategyResponse](#phenixgo-StartUserStrategyResponse) | StartUserStrategy function for initiate a strategy. |
+| UpdateUserStrategy | [UpdateUserStrategyRequest](#phenixgo-UpdateUserStrategyRequest) | [UpdateUserStrategyResponse](#phenixgo-UpdateUserStrategyResponse) | UpdateUserStrategy function for updating a running strategy. |
+| StopUserStrategy | [StopUserStrategyRequest](#phenixgo-StopUserStrategyRequest) | [StopUserStrategyResponse](#phenixgo-StopUserStrategyResponse) | StopUserStrategy function for stopping a running strategy. |
+| GetUserStrategy | [GetStrategyRequest](#phenixgo-GetStrategyRequest) | [GetStrategyResponse](#phenixgo-GetStrategyResponse) | GetUserStrategy function for stopping a running strategy. |
+| GetStrategyProfits | [GetStrategyProfitsRequest](#phenixgo-GetStrategyProfitsRequest) | [GetStrategyProfitsResponse](#phenixgo-GetStrategyProfitsResponse) | GetStrategyProfits function for retrieving strategy profit history. |
+| GetStrategyState | [GetStrategyStateRequest](#phenixgo-GetStrategyStateRequest) | [GetStrategyStateResponse](#phenixgo-GetStrategyStateResponse) | GetStrategyState function for retrieving current strategy state. |
 
  
 

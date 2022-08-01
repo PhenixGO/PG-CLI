@@ -23,6 +23,8 @@ service PhenixGO {
   rpc GetUserStrategy (GetStrategyRequest) returns (GetStrategyResponse) {}
   // GetStrategyProfits function for retrieving strategy profit history.
   rpc GetStrategyProfits (GetStrategyProfitsRequest) returns (GetStrategyProfitsResponse) {}
+  // GetStrategyState function for retrieving current strategy state.
+  rpc GetStrategyState (GetStrategyStateRequest) returns (GetStrategyStateResponse) {}
 }
 
 /* StartUserStrategyRequest represents request for starting a strategy. */
@@ -53,6 +55,7 @@ message UpdateUserStrategyResponse {
 /* StopUserStrategyRequest represents request for stopping a strategy. */
 message StopUserStrategyRequest {
   string strategy_id = 1; // specified target strategy id.
+  bool is_force = 2;
 }
 
 /* StopUserStrategyResponse returns strategy id if stop successfully. */
@@ -90,4 +93,12 @@ message GetStrategyProfitsRequest {
 /* GetStrategyProfitsResponse returns profit data. */
 message GetStrategyProfitsResponse {
   repeated model.Profit profits = 1; // profit data.
+}
+
+message GetStrategyStateRequest {
+  string strategy_id = 1;
+}
+
+message GetStrategyStateResponse {
+  google.protobuf.Any state = 1; 
 }

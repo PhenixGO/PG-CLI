@@ -44,7 +44,7 @@ message Strategy {
   string strategy_id = 1; // unique strategy id for a strategy data.
   string strategy_name = 2; // name
   google.protobuf.Any parameter = 3; // parameters for specified strategy (BitginArbitrageParameter, LendingParameter...).
-  string status = 4; // strategy status (running, stopping, stopped, error).
+  string status = 4; // strategy status (running, stopping, stopped, completed, error).
   google.protobuf.StringValue error_message = 5; // strategy error message
   string user_id = 6; // user id
   google.protobuf.StringValue tag = 7; // tag for strategy instance
@@ -61,4 +61,38 @@ message Profit {
   double amount = 4; // amount for the profit currency
   double rate = 5; // profit rate means the percentage of investing amount
   google.protobuf.Timestamp time = 6; // profit accounting time
+}
+
+enum Event {
+  EventUnknown = 0;
+  EventStatus = 1;
+  EventProfit = 2;
+}
+
+message Notification {
+  Event event = 1;
+  bytes data = 2;
+}
+
+message LendingOffer {
+  string id = 1;
+  string amount = 2;
+  string rate = 3;
+  int32 period = 4;
+  string position_pair = 5;
+  string created_at = 6;
+}
+
+message LendingState {
+  repeated LendingOffer active_offers = 1;
+  repeated LendingOffer open_offers = 2;
+  string available_balance = 3;
+  string updated_at = 4;
+}
+
+message BAState {
+  string total = 1;
+  string sold = 2;
+  string bought = 3;
+  string updated_at = 4;
 }
